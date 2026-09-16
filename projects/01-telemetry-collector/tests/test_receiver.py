@@ -1,6 +1,6 @@
 import socket
 
-from src.telemetry_collector.receiver import UDPReceiver
+from telemetry_collector.receiver import UDPReceiver
 
 
 def test_receiver_receives_udp_packet() -> None:
