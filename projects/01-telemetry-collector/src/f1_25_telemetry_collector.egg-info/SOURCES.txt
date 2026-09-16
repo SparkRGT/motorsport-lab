@@ -1,0 +1,9 @@
+pyproject.toml
+src/f1_25_telemetry_collector.egg-info/PKG-INFO
+src/f1_25_telemetry_collector.egg-info/SOURCES.txt
+src/f1_25_telemetry_collector.egg-info/dependency_links.txt
+src/f1_25_telemetry_collector.egg-info/top_level.txt
+src/telemetry_collector/__init__.py
+src/telemetry_collector/main.py
+src/telemetry_collector/receiver.py
+tests/test_receiver.py
