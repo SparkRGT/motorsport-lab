@@ -13,8 +13,11 @@ from telemetry_collector.car_telemetry import (
 )
 
 
-
-PACKET_PATH = Path("car_telemetry_packet.bin")
+PACKET_PATH = (
+    Path(__file__).parent
+    / "fixtures"
+    / "car_telemetry_packet.bin"
+)
 
 
 def test_car_telemetry_constants() -> None:

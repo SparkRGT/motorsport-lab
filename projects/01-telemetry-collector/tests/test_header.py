@@ -7,7 +7,6 @@ from telemetry_collector.header import (
     parse_packet_header,
 )
 
-
 def test_header_size() -> None:
     assert HEADER_SIZE == 29
 
@@ -18,7 +17,11 @@ def test_parse_header_rejects_short_packet() -> None:
         parse_packet_header(data)
 
 def test_parse_real_f1_25_packet() -> None:
-    packet_path = Path("first_packet.bin")
+    packet_path = (
+        Path(__file__).parent
+        / "fixtures"
+        / "first_packet.bin"
+    )
 
     if not packet_path.exists():
         pytest.skip("first_packet.bin no está disponible.")
