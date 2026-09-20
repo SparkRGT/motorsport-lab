@@ -4,6 +4,10 @@ src/f1_25_telemetry_collector.egg-info/SOURCES.txt
 src/f1_25_telemetry_collector.egg-info/dependency_links.txt
 src/f1_25_telemetry_collector.egg-info/top_level.txt
 src/telemetry_collector/__init__.py
+src/telemetry_collector/car_telemetry.py
+src/telemetry_collector/header.py
 src/telemetry_collector/main.py
 src/telemetry_collector/receiver.py
+tests/test_car_telemetry.py
+tests/test_header.py
 tests/test_receiver.py
