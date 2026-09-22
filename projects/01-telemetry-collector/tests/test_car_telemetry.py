@@ -19,7 +19,6 @@ PACKET_PATH = (
     / "car_telemetry_packet.bin"
 )
 
-
 def test_car_telemetry_constants() -> None:
     assert NUM_CARS == 22
     assert CAR_TELEMETRY_DATA_SIZE == 60
@@ -154,3 +153,9 @@ def test_get_player_car_telemetry_rejects_invalid_index() -> None:
             packet,
             player_car_index=NUM_CARS,
         )
+
+def test_parse_car_telemetry_packet_rejects_oversized_packet() -> None:
+    oversized_packet = b"\x00" * (PACKET_SIZE + 1)
+
+    with pytest.raises(ValueError):
+        parse_car_telemetry_packet(oversized_packet)

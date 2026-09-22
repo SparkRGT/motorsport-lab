@@ -1,4 +1,5 @@
 import socket
+import pytest
 
 from telemetry_collector.receiver import UDPReceiver
 
@@ -37,5 +38,29 @@ def test_receiver_receives_udp_packet() -> None:
         finally:
             sender.close()
 
+    finally:
+        receiver.close()
+
+
+def test_receiver_requires_start_before_receive() -> None:
+    receiver = UDPReceiver(
+        host="127.0.0.1",
+        port=0,
+    )
+
+    with pytest.raises(RuntimeError):
+        receiver.receive()
+
+def test_receiver_cannot_start_twice() -> None:
+    receiver = UDPReceiver(
+        host="127.0.0.1",
+        port=0,
+    )
+
+    receiver.start()
+
+    try:
+        with pytest.raises(RuntimeError):
+            receiver.start()
     finally:
         receiver.close()

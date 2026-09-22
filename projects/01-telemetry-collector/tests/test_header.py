@@ -43,3 +43,12 @@ def test_parse_real_f1_25_packet() -> None:
 
     assert header.player_car_index == 19
     assert header.secondary_player_car_index == 255
+
+def test_parse_header_rejects_empty_packet() -> None:
+    with pytest.raises(ValueError):
+        parse_packet_header(b"")
+
+
+def test_parse_header_rejects_packet_without_complete_header() -> None:
+    with pytest.raises(ValueError):
+        parse_packet_header(b"\x00" * 28)

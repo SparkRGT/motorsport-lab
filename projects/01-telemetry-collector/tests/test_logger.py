@@ -102,3 +102,24 @@ def test_save_creates_both_formats(tmp_path) -> None:
 
     assert json_path.exists()
     assert csv_path.exists()
+
+def test_logger_starts_empty(tmp_path) -> None:
+    logger = TelemetryLogger(
+        output_directory=tmp_path,
+    )
+
+    assert logger.snapshot_count == 0
+
+def test_logger_creates_output_directory(tmp_path) -> None:
+    output_directory = tmp_path / "telemetry"
+
+    logger = TelemetryLogger(
+        output_directory=output_directory,
+    )
+
+    logger.add(create_test_snapshot(100))
+
+    logger.save()
+
+    assert output_directory.exists()
+    assert output_directory.is_dir()
