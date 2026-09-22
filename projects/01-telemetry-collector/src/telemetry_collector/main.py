@@ -1,8 +1,12 @@
+from pathlib import Path
+
 from telemetry_collector.car_telemetry import (
     get_player_car_telemetry,
     parse_car_telemetry_packet,
 )
 from telemetry_collector.header import parse_packet_header
+from telemetry_collector.logger import TelemetryLogger
+from telemetry_collector.models import create_telemetry_snapshot
 from telemetry_collector.receiver import UDPReceiver
 
 
@@ -11,6 +15,8 @@ UDP_PORT = 20777
 
 PACKET_ID_CAR_TELEMETRY = 6
 
+DATA_DIRECTORY = Path("data") / "telemetry"
+
 
 def main() -> None:
     receiver = UDPReceiver(
@@ -18,11 +24,17 @@ def main() -> None:
         port=UDP_PORT,
     )
 
+    telemetry_logger = TelemetryLogger(
+        output_directory=DATA_DIRECTORY,
+        filename="telemetry_session",
+    )
+
     print("F1 25 Telemetry Collector")
     print("==========================")
-    print("UDP Receiver + Car Telemetry Parser")
+    print("UDP Receiver + Telemetry Logger")
     print(f"Escuchando en {UDP_HOST}:{UDP_PORT}")
     print("Esperando telemetría de F1 25...")
+    print("Los datos se guardarán al detener el programa.")
     print("Presiona Ctrl+C para detener.\n")
 
     try:
@@ -55,31 +67,52 @@ def main() -> None:
                     header.player_car_index,
                 )
 
+                snapshot = create_telemetry_snapshot(
+                    header,
+                    player_car,
+                )
+
+                telemetry_logger.add(snapshot)
+
             except ValueError as error:
                 print(
-                    "Error al interpretar Car Telemetry Packet: "
+                    "Error al interpretar "
+                    "Car Telemetry Packet: "
                     f"{error}"
                 )
                 continue
 
             print(
                 f"[Telemetry] "
-                f"Frame: {header.frame_identifier} | "
-                f"Car: {header.player_car_index} | "
-                f"Speed: {player_car.speed} km/h | "
-                f"Throttle: {player_car.throttle * 100:.1f}% | "
-                f"Brake: {player_car.brake * 100:.1f}% | "
-                f"Gear: {player_car.gear} | "
-                f"RPM: {player_car.engine_rpm} | "
-                f"DRS: {'ON' if player_car.drs else 'OFF'}"
+                f"Frame: {snapshot.frame} | "
+                f"Time: {snapshot.session_time:.2f}s | "
+                f"Car: {snapshot.car_index} | "
+                f"Speed: {snapshot.speed} km/h | "
+                f"Throttle: {snapshot.throttle * 100:.1f}% | "
+                f"Brake: {snapshot.brake * 100:.1f}% | "
+                f"Steering: {snapshot.steering:.2f} | "
+                f"Gear: {snapshot.gear} | "
+                f"RPM: {snapshot.engine_rpm} | "
+                f"DRS: {'ON' if snapshot.drs else 'OFF'}"
             )
-            
 
     except KeyboardInterrupt:
-        print("\nReceptor detenido.")
+        print("\nDeteniendo receptor...")
 
     finally:
         receiver.close()
+
+        if telemetry_logger.snapshot_count > 0:
+            json_path, csv_path = telemetry_logger.save()
+
+            print(
+                f"Snapshots guardados: "
+                f"{telemetry_logger.snapshot_count}"
+            )
+            print(f"JSON: {json_path}")
+            print(f"CSV:  {csv_path}")
+        else:
+            print("No se recibieron datos de telemetría.")
 
 
 if __name__ == "__main__":
