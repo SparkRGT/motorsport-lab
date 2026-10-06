@@ -33,17 +33,23 @@ The analyzed data represents the behavior of the vehicle within the EA SPORTS F1
 
 The columns, in order, are `session_time`, `frame`, `lap_number`, `lap_distance`, `speed`, `throttle`, `brake`, `steering`, `gear`, `rpm` and `drs`. `frame` is the packet `overall_frame_identifier`. `rpm` is the engine RPM. `drs` is `0` or `1`. `gear` keeps `-1` for reverse.
 
-Copy that file into `data/real/` and pass the path to `load_csv`. Files in `data/real/` stay out of git. The synthetic fixtures in `data/sample/` remain the automated test data and are not recordings from the game.
+The analyzer reads that CSV in place. It is not copied into this project, and it stays out of git. The synthetic fixtures in `data/sample/` remain the automated fixtures for the rest of the suite.
 
 ```python
 from telemetry_analyzer.ingestion.csv_loader import load_csv
-from telemetry_analyzer.processing.validation import validate_dataset
-from telemetry_analyzer.processing.normalization import normalize_dataset
+from telemetry_analyzer.metrics.basic import calculate_basic_metrics
 from telemetry_analyzer.processing.laps import segment_laps
+from telemetry_analyzer.processing.normalization import normalize_dataset
+from telemetry_analyzer.processing.validation import validate_dataset
 
-dataset = load_csv("data/real/telemetry_session.csv")
+dataset = load_csv(
+    "../01-telemetry-collector/data/telemetry/telemetry_session.csv"
+)
 validate_dataset(dataset)
 laps = segment_laps(normalize_dataset(dataset))
+
+for lap in laps.values():
+    print(lap.lap_number, calculate_basic_metrics(lap))
 ```
 
 ## Project Architecture
