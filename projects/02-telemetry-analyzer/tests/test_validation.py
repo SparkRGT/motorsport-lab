@@ -90,12 +90,28 @@ def test_validate_dataset_rejects_negative_speed():
         validate_dataset(frame)
 
 
-@pytest.mark.parametrize("column", ["lap_number", "gear", "rpm"])
+@pytest.mark.parametrize("column", ["lap_number", "rpm"])
 def test_validate_dataset_rejects_negative_non_negative_columns(column: str):
     frame = _valid_dataset()
     frame.loc[0, column] = -1
 
     with pytest.raises(ValueError, match=column):
+        validate_dataset(frame)
+
+
+@pytest.mark.parametrize("gear", [-1, 0, 8, 9])
+def test_validate_dataset_accepts_documented_gear_values(gear: int):
+    frame = _valid_dataset()
+    frame.loc[0, "gear"] = gear
+
+    assert validate_dataset(frame) is None
+
+
+def test_validate_dataset_rejects_gear_below_reverse():
+    frame = _valid_dataset()
+    frame.loc[0, "gear"] = -2
+
+    with pytest.raises(ValueError, match="gear must be >= -1"):
         validate_dataset(frame)
 
 

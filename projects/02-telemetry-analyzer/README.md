@@ -27,6 +27,25 @@ This project does **not** use real Formula 1 vehicle telemetry.
 
 The analyzed data represents the behavior of the vehicle within the EA SPORTS F1 25 simulation environment.
 
+## Real F1 25 dataset
+
+`projects/01-telemetry-collector` can write a CSV that this analyzer already loads. The collector pairs UDP Packet 6 (Car Telemetry) with Packet 2 (Lap Data) and appends one row per matched frame to `data/telemetry/telemetry_session.csv`.
+
+The columns, in order, are `session_time`, `frame`, `lap_number`, `lap_distance`, `speed`, `throttle`, `brake`, `steering`, `gear`, `rpm` and `drs`. `frame` is the packet `overall_frame_identifier`. `rpm` is the engine RPM. `drs` is `0` or `1`. `gear` keeps `-1` for reverse.
+
+Copy that file into `data/real/` and pass the path to `load_csv`. Files in `data/real/` stay out of git. The synthetic fixtures in `data/sample/` remain the automated test data and are not recordings from the game.
+
+```python
+from telemetry_analyzer.ingestion.csv_loader import load_csv
+from telemetry_analyzer.processing.validation import validate_dataset
+from telemetry_analyzer.processing.normalization import normalize_dataset
+from telemetry_analyzer.processing.laps import segment_laps
+
+dataset = load_csv("data/real/telemetry_session.csv")
+validate_dataset(dataset)
+laps = segment_laps(normalize_dataset(dataset))
+```
+
 ## Project Architecture
 
 The project is designed as an analysis layer over recorded telemetry data produced by the Motorsport Lab telemetry collection workflow.

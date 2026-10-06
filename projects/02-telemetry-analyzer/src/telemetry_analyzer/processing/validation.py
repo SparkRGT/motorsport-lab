@@ -101,7 +101,7 @@ def _require_ranges(df: pd.DataFrame) -> None:
             (df["brake"] < 0.0) | (df["brake"] > 1.0),
             "brake must be between 0.0 and 1.0 inclusive",
         ),
-        ("gear", df["gear"] < 0, "gear must be >= 0"),
+        ("gear", df["gear"] < -1, "gear must be >= -1"),
         ("rpm", df["rpm"] < 0, "rpm must be >= 0"),
         ("drs", ~df["drs"].isin([0, 1]), "drs must be 0 or 1"),
     ]

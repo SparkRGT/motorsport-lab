@@ -43,6 +43,24 @@ class TelemetrySnapshot:
                 "Steering debe estar entre -1.0 y 1.0."
             )
 
+
+@dataclass(frozen=True)
+class AnalysisRow:
+    """Fila del dataset analítico que consume el telemetry analyzer."""
+
+    session_time: float
+    frame: int
+    lap_number: int
+    lap_distance: float
+    speed: int
+    throttle: float
+    brake: float
+    steering: float
+    gear: int
+    rpm: int
+    drs: int
+
+
 def create_telemetry_snapshot(
     header: PacketHeader,
     car: CarTelemetryData,

@@ -2,25 +2,26 @@ import csv
 import json
 from pathlib import Path
 
-from telemetry_collector.models import TelemetrySnapshot
+from telemetry_collector.models import AnalysisRow
 
 
 CSV_FIELDS = (
-    "frame",
     "session_time",
-    "car_index",
+    "frame",
+    "lap_number",
+    "lap_distance",
     "speed",
     "throttle",
     "brake",
     "steering",
     "gear",
-    "engine_rpm",
+    "rpm",
     "drs",
 )
 
 
 class TelemetryLogger:
-    """Guarda snapshots de telemetría en JSON y CSV."""
+    """Escribe el CSV analítico al vuelo y el JSON al cierre."""
 
     def __init__(
         self,
@@ -38,15 +39,63 @@ class TelemetryLogger:
             self.output_directory / f"{self.filename}.csv"
         )
 
-        self._snapshots: list[TelemetrySnapshot] = []
+        self._rows: list[AnalysisRow] = []
+        self._csv_file = None
+        self._csv_writer: csv.DictWriter | None = None
 
-    def add(self, snapshot: TelemetrySnapshot) -> None:
-        """Agrega un snapshot al registro actual."""
+    def start(self) -> Path:
+        """Crea el CSV y escribe el encabezado una sola vez."""
 
-        self._snapshots.append(snapshot)
+        if self._csv_writer is not None:
+            return self.csv_path
+
+        self.output_directory.mkdir(
+            parents=True,
+            exist_ok=True,
+        )
+
+        self._csv_file = self.csv_path.open(
+            "w",
+            encoding="utf-8",
+            newline="",
+        )
+        self._csv_writer = csv.DictWriter(
+            self._csv_file,
+            fieldnames=CSV_FIELDS,
+        )
+        self._csv_writer.writeheader()
+        self._csv_file.flush()
+
+        return self.csv_path
+
+    def write_row(self, row: AnalysisRow) -> None:
+        """Agrega una fila al CSV y la conserva para el JSON final."""
+
+        if self._csv_writer is None or self._csv_file is None:
+            self.start()
+
+        assert self._csv_writer is not None
+        assert self._csv_file is not None
+
+        self._csv_writer.writerow(
+            _csv_values(row)
+        )
+        self._csv_file.flush()
+        self._rows.append(row)
+
+    def close(self) -> None:
+        """Cierra el CSV incremental."""
+
+        if self._csv_file is None:
+            return
+
+        self._csv_file.flush()
+        self._csv_file.close()
+        self._csv_file = None
+        self._csv_writer = None
 
     def save_json(self) -> Path:
-        """Guarda todos los snapshots en formato JSON."""
+        """Guarda las filas ya escritas en JSON."""
 
         self.output_directory.mkdir(
             parents=True,
@@ -54,19 +103,8 @@ class TelemetryLogger:
         )
 
         data = [
-            {
-                "frame": snapshot.frame,
-                "session_time": snapshot.session_time,
-                "car_index": snapshot.car_index,
-                "speed": snapshot.speed,
-                "throttle": snapshot.throttle,
-                "brake": snapshot.brake,
-                "steering": snapshot.steering,
-                "gear": snapshot.gear,
-                "engine_rpm": snapshot.engine_rpm,
-                "drs": snapshot.drs,
-            }
-            for snapshot in self._snapshots
+            _json_values(row)
+            for row in self._rows
         ]
 
         with self.json_path.open(
@@ -83,53 +121,53 @@ class TelemetryLogger:
         return self.json_path
 
     def save_csv(self) -> Path:
-        """Guarda todos los snapshots en formato CSV."""
+        """Devuelve el CSV ya escrito de forma incremental."""
 
-        self.output_directory.mkdir(
-            parents=True,
-            exist_ok=True,
-        )
+        if self._csv_writer is None:
+            self.start()
 
-        with self.csv_path.open(
-            "w",
-            encoding="utf-8",
-            newline="",
-        ) as file:
-            writer = csv.DictWriter(
-                file,
-                fieldnames=CSV_FIELDS,
-            )
-
-            writer.writeheader()
-
-            for snapshot in self._snapshots:
-                writer.writerow(
-                    {
-                        "frame": snapshot.frame,
-                        "session_time": snapshot.session_time,
-                        "car_index": snapshot.car_index,
-                        "speed": snapshot.speed,
-                        "throttle": snapshot.throttle,
-                        "brake": snapshot.brake,
-                        "steering": snapshot.steering,
-                        "gear": snapshot.gear,
-                        "engine_rpm": snapshot.engine_rpm,
-                        "drs": snapshot.drs,
-                    }
-                )
+        if self._csv_file is not None:
+            self._csv_file.flush()
 
         return self.csv_path
 
     def save(self) -> tuple[Path, Path]:
-        """Guarda los datos en JSON y CSV."""
+        """Cierra el CSV y guarda el JSON de la sesión."""
 
-        json_path = self.save_json()
         csv_path = self.save_csv()
+        self.close()
+        json_path = self.save_json()
 
         return json_path, csv_path
 
     @property
-    def snapshot_count(self) -> int:
-        """Cantidad de snapshots almacenados."""
+    def row_count(self) -> int:
+        """Cantidad de filas analíticas escritas."""
 
-        return len(self._snapshots)
+        return len(self._rows)
+
+    @property
+    def snapshot_count(self) -> int:
+        """Alias de ``row_count`` usado por el flujo de cierre."""
+
+        return self.row_count
+
+
+def _csv_values(row: AnalysisRow) -> dict[str, object]:
+    return {
+        "session_time": row.session_time,
+        "frame": row.frame,
+        "lap_number": row.lap_number,
+        "lap_distance": row.lap_distance,
+        "speed": row.speed,
+        "throttle": row.throttle,
+        "brake": row.brake,
+        "steering": row.steering,
+        "gear": row.gear,
+        "rpm": row.rpm,
+        "drs": row.drs,
+    }
+
+
+def _json_values(row: AnalysisRow) -> dict[str, object]:
+    return _csv_values(row)

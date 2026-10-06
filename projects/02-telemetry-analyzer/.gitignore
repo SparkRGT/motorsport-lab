@@ -35,6 +35,10 @@ Thumbs.db
 data/raw/*
 data/processed/*
 
+# Capturas locales de F1 25. No forman parte de los fixtures sintéticos.
+data/real/*
+!data/real/.gitkeep
+
 # Keep sample data
 !data/sample/
 !data/sample/**
