@@ -2,6 +2,10 @@
 
 from telemetry_analyzer.analysis.corners import CornerSegment, detect_corner_segments
 from telemetry_analyzer.analysis.distance import align_laps_by_distance
+from telemetry_analyzer.analysis.event_performance import (
+    PerformanceEvent,
+    analyze_event_performance,
+)
 from telemetry_analyzer.analysis.lap_performance import (
     LapPerformanceAnalysis,
     analyze_lap_performance,
@@ -24,9 +28,11 @@ __all__ = [
     "BrakingZone",
     "CornerSegment",
     "LapPerformanceAnalysis",
+    "PerformanceEvent",
     "PerformanceSegment",
     "SessionSummary",
     "align_laps_by_distance",
+    "analyze_event_performance",
     "analyze_lap_performance",
     "analyze_session",
     "calculate_time_delta",

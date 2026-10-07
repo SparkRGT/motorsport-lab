@@ -60,6 +60,10 @@ for lap in laps.values():
 
 `analyze_lap_performance` compares two laps on the distance they share. It aligns them with `align_laps_by_distance`, adds the cumulative time difference with `calculate_time_delta`, and finds where that difference changes significantly with `detect_performance_segments`. The sign stays `compared - reference`: a negative total means the compared lap took less time.
 
+## Event performance
+
+`analyze_event_performance` reads that cumulative time delta inside braking zones, acceleration zones, and corner segments already detected on the reference lap. For each event it reports how many seconds the delta changed between the event's start and end distance. A corner can overlap its braking and acceleration; all three events are kept. This measures the change only. It does not explain why the driver gained or lost time.
+
 ## Project Architecture
 
 The project is designed as an analysis layer over recorded telemetry data produced by the Motorsport Lab telemetry collection workflow.
