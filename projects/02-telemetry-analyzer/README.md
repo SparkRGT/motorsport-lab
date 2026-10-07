@@ -56,6 +56,10 @@ for lap in laps.values():
 
 `analyze_session` runs that same pipeline and returns a `SessionSummary`. It does not calculate speed, throttle, brake, RPM, or gear usage itself; those values come from `calculate_basic_metrics`. Lap segmentation still keeps every lap number. Fastest and slowest are chosen only among laps whose furthest `lap_distance` reaches at least 90% of the longest lap in that file. A short final lap stays in the summary and is not treated as the slowest lap. The comparison distance comes from the session, not from a fixed track length. If fewer than two laps qualify, fastest and slowest are left empty.
 
+## Lap performance
+
+`analyze_lap_performance` compares two laps on the distance they share. It aligns them with `align_laps_by_distance`, adds the cumulative time difference with `calculate_time_delta`, and finds where that difference changes significantly with `detect_performance_segments`. The sign stays `compared - reference`: a negative total means the compared lap took less time.
+
 ## Project Architecture
 
 The project is designed as an analysis layer over recorded telemetry data produced by the Motorsport Lab telemetry collection workflow.
