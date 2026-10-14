@@ -64,6 +64,14 @@ for lap in laps.values():
 
 `analyze_event_performance` reads that cumulative time delta inside braking zones, acceleration zones, and corner segments already detected on the reference lap. For each event it reports how many seconds the delta changed between the event's start and end distance. A corner can overlap its braking and acceleration; all three events are kept. This measures the change only. It does not explain why the driver gained or lost time.
 
+## Driver metrics
+
+`calculate_driver_performance_metrics` reports braking, corner, and acceleration indicators for two laps. The reference lap's braking zones, acceleration zones, and corner segments define the distance windows. Both laps are measured on those same windows through the aligned telemetry. Each comparison is `compared - reference`.
+
+Speed stays in km/h, distance in metres, duration in seconds, and throttle and brake in the recorded 0 to 1 range. Duration is the time taken to cover that shared distance. It is not the session-time length of a zone detected separately on each lap. A window outside the common distance is omitted.
+
+These indicators describe the telemetry inside each window. They do not diagnose driving or recommend what the driver should change.
+
 ## Project Architecture
 
 The project is designed as an analysis layer over recorded telemetry data produced by the Motorsport Lab telemetry collection workflow.

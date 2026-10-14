@@ -2,6 +2,14 @@
 
 from telemetry_analyzer.analysis.corners import CornerSegment, detect_corner_segments
 from telemetry_analyzer.analysis.distance import align_laps_by_distance
+from telemetry_analyzer.analysis.driver_metrics import (
+    AccelerationMetrics,
+    BrakingMetrics,
+    CornerMetrics,
+    DriverPerformanceMetrics,
+    MetricComparison,
+    calculate_driver_performance_metrics,
+)
 from telemetry_analyzer.analysis.event_performance import (
     PerformanceEvent,
     analyze_event_performance,
@@ -24,10 +32,15 @@ from telemetry_analyzer.analysis.zones import (
 )
 
 __all__ = [
+    "AccelerationMetrics",
     "AccelerationZone",
+    "BrakingMetrics",
     "BrakingZone",
+    "CornerMetrics",
     "CornerSegment",
+    "DriverPerformanceMetrics",
     "LapPerformanceAnalysis",
+    "MetricComparison",
     "PerformanceEvent",
     "PerformanceSegment",
     "SessionSummary",
@@ -35,6 +48,7 @@ __all__ = [
     "analyze_event_performance",
     "analyze_lap_performance",
     "analyze_session",
+    "calculate_driver_performance_metrics",
     "calculate_time_delta",
     "detect_acceleration_zones",
     "detect_braking_zones",
