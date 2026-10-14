@@ -31,7 +31,7 @@ Thumbs.db
 .env
 .env.*
 
-# Generated analysis data
+# Generated analysis data. The monorepo also ignores every data/ directory.
 data/raw/*
 data/processed/*
 
@@ -39,6 +39,10 @@ data/processed/*
 data/real/*
 !data/real/.gitkeep
 
-# Keep sample data
-!data/sample/
-!data/sample/**
+# Informes y gráficas generados por generate_session_report.
+output/
+
+# Archivos temporales
+*.tmp
+*.temp
+*~

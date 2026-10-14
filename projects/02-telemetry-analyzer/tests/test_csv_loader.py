@@ -8,8 +8,7 @@ from telemetry_analyzer.ingestion.csv_loader import load_csv
 
 SAMPLE_DATASET = (
     Path(__file__).parent.parent
-    / "data"
-    / "sample"
+    / "fixtures"
     / "telemetry_sample.csv"
 )
 

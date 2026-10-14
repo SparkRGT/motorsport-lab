@@ -8,7 +8,7 @@ from telemetry_analyzer.processing.validation import validate_dataset
 
 
 SAMPLE_DATASET = (
-    Path(__file__).parent.parent / "data" / "sample" / "telemetry_sample.csv"
+    Path(__file__).parent.parent / "fixtures" / "telemetry_sample.csv"
 )
 
 

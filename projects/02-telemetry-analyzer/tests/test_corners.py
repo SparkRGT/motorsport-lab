@@ -12,7 +12,7 @@ from telemetry_analyzer.processing.validation import validate_dataset
 
 
 LAPS_DATASET = (
-    Path(__file__).parent.parent / "data" / "sample" / "telemetry_laps_sample.csv"
+    Path(__file__).parent.parent / "fixtures" / "telemetry_laps_sample.csv"
 )
 
 

@@ -24,7 +24,7 @@ from telemetry_analyzer.visualization.telemetry import (
 
 
 LAPS_DATASET = (
-    Path(__file__).parent.parent / "data" / "sample" / "telemetry_laps_sample.csv"
+    Path(__file__).parent.parent / "fixtures" / "telemetry_laps_sample.csv"
 )
 
 

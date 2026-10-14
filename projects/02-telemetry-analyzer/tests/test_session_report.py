@@ -31,8 +31,7 @@ from telemetry_analyzer.reporting.session_report import _json_value
 
 SAMPLE_DATASET = (
     Path(__file__).resolve().parents[1]
-    / "data"
-    / "sample"
+    / "fixtures"
     / "telemetry_laps_sample.csv"
 )
 

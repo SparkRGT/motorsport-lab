@@ -9,7 +9,7 @@ from telemetry_analyzer.processing.validation import REQUIRED_COLUMNS, validate_
 
 
 SAMPLE_DATASET = (
-    Path(__file__).parent.parent / "data" / "sample" / "telemetry_sample.csv"
+    Path(__file__).parent.parent / "fixtures" / "telemetry_sample.csv"
 )
 
 FLOAT_COLUMNS = [
