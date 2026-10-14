@@ -72,6 +72,47 @@ Speed stays in km/h, distance in metres, duration in seconds, and throttle and b
 
 These indicators describe the telemetry inside each window. They do not diagnose driving or recommend what the driver should change.
 
+## Session report
+
+`generate_session_report` is the Python entry point for one CSV. It validates, normalizes, and segments the file through `analyze_session`, then returns a `SessionReport`. There is no command-line interface.
+
+Without lap numbers, the report contains the session summary and `comparison` is `None`. `comparison_note` says that a lap comparison was not requested. Pass both `reference_lap` and `compared_lap` to add the basic `LapComparison`, the distance time delta, performance segments, event performance, and driver metrics. Deltas stay `compared - reference`. The report uses one `LapPerformanceAnalysis` for the event and driver-metric steps.
+
+If those two laps do not share a distance range, the session summary is kept and the comparison is left empty with an explicit note. A missing file, an invalid dataset, an unknown lap number, or only one selected lap raises an error.
+
+`output_dir` writes `session_report.json` and, only when a comparison exists, four PNG files from the existing plot functions:
+
+```text
+output_dir/
+├── session_report.json
+└── plots/
+    ├── speed_comparison.png
+    ├── speed_delta.png
+    ├── throttle_comparison.png
+    └── brake_comparison.png
+```
+
+The JSON lists those plots as paths relative to `output_dir`. It does not contain the aligned distance table or an absolute path. Non-finite numbers are rejected instead of being written as JSON null or zero.
+
+```python
+from pathlib import Path
+
+from telemetry_analyzer.reporting import generate_session_report
+
+csv_path = Path("../01-telemetry-collector/data/telemetry/telemetry_session.csv")
+
+summary = generate_session_report(csv_path)
+
+report = generate_session_report(
+    csv_path,
+    reference_lap=2,
+    compared_lap=3,
+    output_dir=Path("output/session"),
+)
+```
+
+The lap numbers in that example must exist in the local CSV. The collector file stays where Project 01 wrote it; `generate_session_report` reads it in place and does not copy it into the analyzer. Fastest and slowest laps still follow the session rule from `analyze_session`: only laps that reach 90% of the longest lap in that file are eligible. The report measures telemetry. It does not diagnose the driver or recommend a different line.
+
 ## Project Architecture
 
 The project is designed as an analysis layer over recorded telemetry data produced by the Motorsport Lab telemetry collection workflow.
@@ -91,9 +132,10 @@ F1 Telemetry Analyzer
        ├── Validation
        ├── Normalization
        ├── Lap Segmentation
-       ├── Metrics
-       ├── Lap Comparison
-       └── Visualization
+        ├── Metrics
+        ├── Lap Comparison
+        ├── Visualization
+        └── Session Report
 ```
 
 ## Technology
