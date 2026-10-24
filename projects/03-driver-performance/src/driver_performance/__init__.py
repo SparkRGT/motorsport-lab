@@ -1,6 +1,7 @@
 
 """Evidence-based driver performance analysis."""
 
+from driver_performance.style_analysis import analyze_driving_style
 from driver_performance.models import (
     ConfidenceLevel,
     Diagnosis,
